@@ -6,34 +6,43 @@ const FILTERS = ['all', 'todo', 'done']
 
 class App extends Component {
   state = {
-    tasks: [],
+    tasks: {},
     filter: FILTERS[0]
   }
 
-  changeFilter = (filter) => {
+  changeFilter = (e) => {
+    const filter = e.target.name
     this.setState({ filter })
   }
 
   addTasks = (e) => {
-    if (e.key === 'Enter') {
+    if (e.key === 'Enter' && e.target.value !== '') {
       const { tasks } = this.state
-      tasks.push({
-        id: new Date().toISOString(),
+      const id = Date.now()
+      tasks[id] = {
         text: e.target.value,
         done: false
-      })
+      }
       e.target.value = ''
       this.setState({ tasks })
     }
   }
 
-  toggleDone = (id) => {
+  deleteTask = (id) => {
     let { tasks } = this.state
-    tasks.map((task, i) =>{
-      if (task.id === id) {
-        tasks[i].done = !tasks[i].done
-      }
-    })
+    delete tasks[id]
+    this.setState({ tasks })
+  }
+
+  removeAll = () => {
+    const tasks = {}
+    this.setState({ tasks })
+  }
+
+  toggleDone = (e) => {
+    let { tasks } = this.state
+    const id = e.target.name
+    tasks[id].done = !tasks[id].done
     this.setState({ tasks })
   }
 
@@ -62,7 +71,11 @@ class App extends Component {
                 FILTERS.map((filter) => {
                   const filterClass = (filter === this.state.filter) ? 'is-active' : ''
                   return (
-                    <a className={filterClass} onClick={() => this.changeFilter(filter)}>
+                    <a key={filter}
+                      className={filterClass} 
+                      name={filter}
+                      onClick={this.changeFilter}
+                    >
                       {filter}
                     </a>
                   )
@@ -70,24 +83,35 @@ class App extends Component {
               }
             </p>
             {
-              tasks.map((task) => {
+              Object.keys(tasks).map((id) => {
+                const task = tasks[id]
                 if ((task.done && this.state.filter === 'todo') || ((!task.done && this.state.filter === 'done'))) {
                   return null
                 }
                 return (
-                  <label className="panel-block" key={task.id}>
-                    <input 
+                  <label className="panel-block" key={id}>
+                    <input
                       type="checkbox"
                       defaultChecked={task.done}
-                      onClick={() => this.toggleDone(task.id)}
+                      name={id}
+                      onClick={this.toggleDone}
                     />
                     { task.text }
+                    <span 
+                      className="icon has-text-grey-light"
+                      onClick={() => this.deleteTask(id)}
+                    >
+                      <i className="fas fa-times-circle"></i>
+                    </span>
                   </label>
                 )
               })
             }
             <div className="panel-block">
-              <button className="button is-link is-outlined is-fullwidth">
+              <button 
+                className="button is-link is-outlined is-fullwidth"
+                onClick={this.removeAll}
+              >
                 remove all
               </button>
             </div>
