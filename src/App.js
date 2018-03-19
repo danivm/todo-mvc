@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { Component } from 'react'
 import './App.scss'
 import 'bulma/css/bulma.css'
 
@@ -10,12 +10,12 @@ class App extends Component {
     filter: FILTERS[0]
   }
 
-  changeFilter = (e) => {
+  changeFilter = e => {
     const filter = e.target.name
     this.setState({ filter })
   }
 
-  addTasks = (e) => {
+  addTasks = e => {
     if (e.key === 'Enter' && e.target.value !== '') {
       const { tasks } = this.state
       const id = Date.now()
@@ -28,7 +28,7 @@ class App extends Component {
     }
   }
 
-  deleteTask = (id) => {
+  deleteTask = id => {
     let { tasks } = this.state
     delete tasks[id]
     this.setState({ tasks })
@@ -39,26 +39,24 @@ class App extends Component {
     this.setState({ tasks })
   }
 
-  toggleDone = (e) => {
+  toggleDone = e => {
     let { tasks } = this.state
     const id = e.target.name
     tasks[id].done = !tasks[id].done
     this.setState({ tasks })
   }
 
-  render() {
+  render () {
     const { tasks } = this.state
 
     return (
       <div className="section">
         <div className="container">
           <nav className="panel">
-            <p className="panel-heading">
-              TODO MVC
-            </p>
+            <p className="panel-heading">TODO MVC</p>
             <div className="panel-block">
               <p className="control">
-                <input 
+                <input
                   className="input"
                   type="text"
                   placeholder="add task"
@@ -67,48 +65,49 @@ class App extends Component {
               </p>
             </div>
             <p className="panel-tabs">
-              {
-                FILTERS.map((filter) => {
-                  const filterClass = (filter === this.state.filter) ? 'is-active' : ''
-                  return (
-                    <a key={filter}
-                      className={filterClass} 
-                      name={filter}
-                      onClick={this.changeFilter}
-                    >
-                      {filter}
-                    </a>
-                  )
-                })
-              }
-            </p>
-            {
-              Object.keys(tasks).map((id) => {
-                const task = tasks[id]
-                if ((task.done && this.state.filter === 'todo') || ((!task.done && this.state.filter === 'done'))) {
-                  return null
-                }
+              {FILTERS.map(filter => {
+                const filterClass =
+                  filter === this.state.filter ? 'is-active' : ''
                 return (
-                  <label className="panel-block" key={id}>
-                    <input
-                      type="checkbox"
-                      defaultChecked={task.done}
-                      name={id}
-                      onClick={this.toggleDone}
-                    />
-                    { task.text }
-                    <span 
-                      className="icon has-text-grey-light"
-                      onClick={() => this.deleteTask(id)}
-                    >
-                      <i className="fas fa-times-circle"></i>
-                    </span>
-                  </label>
+                  <a
+                    key={filter}
+                    className={filterClass}
+                    name={filter}
+                    onClick={this.changeFilter}
+                  >
+                    {filter}
+                  </a>
                 )
-              })
-            }
+              })}
+            </p>
+            {Object.keys(tasks).map(id => {
+              const task = tasks[id]
+              if (
+                (task.done && this.state.filter === 'todo') ||
+                (!task.done && this.state.filter === 'done')
+              ) {
+                return null
+              }
+              return (
+                <label className="panel-block" key={id}>
+                  <input
+                    type="checkbox"
+                    defaultChecked={task.done}
+                    name={id}
+                    onClick={this.toggleDone}
+                  />
+                  {task.text}
+                  <span
+                    className="icon has-text-grey-light"
+                    onClick={() => this.deleteTask(id)}
+                  >
+                    <i className="fas fa-times-circle" />
+                  </span>
+                </label>
+              )
+            })}
             <div className="panel-block">
-              <button 
+              <button
                 className="button is-link is-outlined is-fullwidth"
                 onClick={this.removeAll}
               >
@@ -118,8 +117,8 @@ class App extends Component {
           </nav>
         </div>
       </div>
-    );
+    )
   }
 }
 
-export default App;
+export default App
