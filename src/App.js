@@ -1,14 +1,21 @@
 import React, { Component } from 'react'
 import FilterTabs from './filterTabs'
+import TaskList from './taskList'
 import './App.scss'
 import 'bulma/css/bulma.css'
 
 const FILTERS = ['all', 'todo', 'done']
+const STORAGE_KEY = 'todo-mvc-tasks'
 
 class App extends Component {
   state = {
-    tasks: {},
-    activeFilter: FILTERS[0]
+    activeFilter: FILTERS[0],
+    tasks: {}
+  }
+
+  componentDidMount () {
+    const tasks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}
+    this.setState({ tasks })
   }
 
   handleChangeFilter = e => {
@@ -25,25 +32,30 @@ class App extends Component {
         done: false
       }
       e.target.value = ''
-      this.setState({ tasks })
+      this.updateTasks(tasks)
     }
   }
 
-  deleteTask = id => {
+  handleDeleteTask = id => {
     let { tasks } = this.state
     delete tasks[id]
-    this.setState({ tasks })
+    this.updateTasks(tasks)
   }
 
   removeAll = () => {
     const tasks = {}
-    this.setState({ tasks })
+    this.updateTasks(tasks)
   }
 
-  toggleDone = e => {
+  handleToggleDone = e => {
     let { tasks } = this.state
     const id = e.target.name
     tasks[id].done = !tasks[id].done
+    this.updateTasks(tasks)
+  }
+
+  updateTasks = tasks => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
     this.setState({ tasks })
   }
 
@@ -70,32 +82,12 @@ class App extends Component {
               changeFilter={this.handleChangeFilter}
               filters={FILTERS}
             />
-            {Object.keys(tasks).map(id => {
-              const task = tasks[id]
-              if (
-                (task.done && this.state.activeFilter === 'todo') ||
-                (!task.done && this.state.activeFilter === 'done')
-              ) {
-                return null
-              }
-              return (
-                <label className="panel-block" key={id}>
-                  <input
-                    type="checkbox"
-                    defaultChecked={task.done}
-                    name={id}
-                    onClick={this.toggleDone}
-                  />
-                  {task.text}
-                  <span
-                    className="icon has-text-grey-light"
-                    onClick={() => this.deleteTask(id)}
-                  >
-                    <i className="fas fa-times-circle" />
-                  </span>
-                </label>
-              )
-            })}
+            <TaskList 
+              activeFilter={activeFilter}
+              deleteTask={this.handleDeleteTask}
+              tasks={tasks}
+              toggleDone={this.handleToggleDone}
+            />
             <div className="panel-block">
               <button
                 className="button is-link is-outlined is-fullwidth"
