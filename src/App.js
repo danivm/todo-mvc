@@ -63,16 +63,16 @@ class App extends Component {
     const { activeFilter, tasks } = this.state
 
     return (
-      <div className="section">
-        <div className="container">
-          <nav className="panel">
-            <p className="panel-heading">TODO MVC</p>
-            <div className="panel-block">
-              <p className="control">
+      <div className='section'>
+        <div className='container'>
+          <nav className='panel'>
+            <p className='panel-heading'>TODO MVC</p>
+            <div className='panel-block'>
+              <p className='control'>
                 <input
-                  className="input"
-                  type="text"
-                  placeholder="add task"
+                  className='input'
+                  type='text'
+                  placeholder='add task'
                   onKeyPress={this.addTasks}
                 />
               </p>
@@ -82,15 +82,15 @@ class App extends Component {
               changeFilter={this.handleChangeFilter}
               filters={FILTERS}
             />
-            <TaskList 
+            <TaskList
               activeFilter={activeFilter}
               deleteTask={this.handleDeleteTask}
               tasks={tasks}
               toggleDone={this.handleToggleDone}
             />
-            <div className="panel-block">
+            <div className='panel-block'>
               <button
-                className="button is-link is-outlined is-fullwidth"
+                className='button is-link is-outlined is-fullwidth'
                 onClick={this.removeAll}
               >
                 remove all

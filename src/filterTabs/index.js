@@ -5,7 +5,7 @@ class FilterTabs extends Component {
   render () {
     const { activeFilter, changeFilter, filters } = this.props
     return (
-      <p className="panel-tabs">
+      <p className='panel-tabs'>
         {filters.map(filter => {
           const filterClass = filter === activeFilter ? 'is-active' : ''
           return (

@@ -1,12 +1,12 @@
 import React, { Component, Fragment } from 'react'
 import PropTypes from 'prop-types'
 
-class FilterTabs extends Component {
+class TaskList extends Component {
   filterTasks = id => {
     const { activeFilter, tasks } = this.props
     const task = tasks[id]
     return (
-      (activeFilter === 'all') ||
+      activeFilter === 'all' ||
       (task.done && activeFilter === 'done') ||
       (!task.done && activeFilter === 'todo')
     )
@@ -21,19 +21,19 @@ class FilterTabs extends Component {
           .map(id => {
             const task = tasks[id]
             return (
-              <label className="panel-block" key={id}>
+              <label className='panel-block' key={id}>
                 <input
-                  type="checkbox"
+                  type='checkbox'
                   defaultChecked={task.done}
                   name={id}
                   onClick={toggleDone}
                 />
                 {task.text}
                 <span
-                  className="icon has-text-grey-light"
+                  className='icon has-text-grey-light'
                   onClick={() => deleteTask(id)}
                 >
-                  <i className="fas fa-times-circle" />
+                  <i className='fas fa-times-circle' />
                 </span>
               </label>
             )
@@ -43,11 +43,11 @@ class FilterTabs extends Component {
   }
 }
 
-FilterTabs.propTypes = {
+TaskList.propTypes = {
   activeFilter: PropTypes.string.isRequired,
   tasks: PropTypes.object.isRequired,
   toggleDone: PropTypes.func.isRequired,
   deleteTask: PropTypes.func.isRequired
 }
 
-export default FilterTabs
+export default TaskList
