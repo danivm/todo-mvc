@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import FilterTabs from './filterTabs'
 import './App.scss'
 import 'bulma/css/bulma.css'
 
@@ -7,12 +8,12 @@ const FILTERS = ['all', 'todo', 'done']
 class App extends Component {
   state = {
     tasks: {},
-    filter: FILTERS[0]
+    activeFilter: FILTERS[0]
   }
 
-  changeFilter = e => {
-    const filter = e.target.name
-    this.setState({ filter })
+  handleChangeFilter = e => {
+    const activeFilter = e.target.name
+    this.setState({ activeFilter })
   }
 
   addTasks = e => {
@@ -47,7 +48,7 @@ class App extends Component {
   }
 
   render () {
-    const { tasks } = this.state
+    const { activeFilter, tasks } = this.state
 
     return (
       <div className="section">
@@ -64,27 +65,16 @@ class App extends Component {
                 />
               </p>
             </div>
-            <p className="panel-tabs">
-              {FILTERS.map(filter => {
-                const filterClass =
-                  filter === this.state.filter ? 'is-active' : ''
-                return (
-                  <a
-                    key={filter}
-                    className={filterClass}
-                    name={filter}
-                    onClick={this.changeFilter}
-                  >
-                    {filter}
-                  </a>
-                )
-              })}
-            </p>
+            <FilterTabs
+              activeFilter={activeFilter}
+              changeFilter={this.handleChangeFilter}
+              filters={FILTERS}
+            />
             {Object.keys(tasks).map(id => {
               const task = tasks[id]
               if (
-                (task.done && this.state.filter === 'todo') ||
-                (!task.done && this.state.filter === 'done')
+                (task.done && this.state.activeFilter === 'todo') ||
+                (!task.done && this.state.activeFilter === 'done')
               ) {
                 return null
               }
