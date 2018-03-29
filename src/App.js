@@ -14,6 +14,10 @@ class App extends Component {
   }
 
   componentDidMount () {
+    this.getTasks()
+  }
+
+  getTasks = () => {
     const tasks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}
     this.setState({ tasks })
   }
