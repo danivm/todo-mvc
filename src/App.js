@@ -1,11 +1,12 @@
 import React, { Component } from 'react'
 import FilterTabs from './filterTabs'
 import TaskList from './taskList'
+import db from './firebase'
 import './App.scss'
 import 'bulma/css/bulma.css'
 
 const FILTERS = ['all', 'todo', 'done']
-const STORAGE_KEY = 'todo-mvc-tasks'
+const dbTasks = db.collection('tasks')
 
 class App extends Component {
   state = {
@@ -18,8 +19,13 @@ class App extends Component {
   }
 
   getTasks = () => {
-    const tasks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}
-    this.setState({ tasks })
+    const tasks = {}
+    dbTasks.get().then(snapshot => {
+      snapshot.forEach(task => {
+        tasks[task.id] = task.data()
+      })
+      this.setState({ tasks })
+    })
   }
 
   handleChangeFilter = e => {
@@ -30,53 +36,54 @@ class App extends Component {
   addTasks = e => {
     if (e.key === 'Enter' && e.target.value !== '') {
       const { tasks } = this.state
-      const id = Date.now()
-      tasks[id] = {
-        text: e.target.value,
-        done: false
-      }
+      const text = e.target.value
+      const task = { text, done: false }
+      const id = Date.now().toString()
+      tasks[id] = task
+      this.setState({ tasks })
+      dbTasks.doc(id).set(task)
       e.target.value = ''
-      this.updateTasks(tasks)
     }
   }
 
   handleDeleteTask = id => {
-    let { tasks } = this.state
+    const { tasks } = this.state
     delete tasks[id]
-    this.updateTasks(tasks)
+    this.setState({ tasks })
+    dbTasks.doc(id).delete()
   }
 
   removeAll = () => {
-    const tasks = {}
-    this.updateTasks(tasks)
+    let { tasks } = this.state
+    Object.keys(tasks).map(id => {
+      dbTasks.doc(id).delete()
+    })
+    tasks = {}
+    this.setState({ tasks })
   }
 
   handleToggleDone = e => {
     let { tasks } = this.state
     const id = e.target.name
     tasks[id].done = !tasks[id].done
-    this.updateTasks(tasks)
-  }
-
-  updateTasks = tasks => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
     this.setState({ tasks })
+    dbTasks.doc(id).set(tasks[id])
   }
 
   render () {
     const { activeFilter, tasks } = this.state
 
     return (
-      <div className='section'>
-        <div className='container'>
-          <nav className='panel'>
-            <p className='panel-heading'>TODO MVC</p>
-            <div className='panel-block'>
-              <p className='control'>
+      <div className="section">
+        <div className="container">
+          <nav className="panel">
+            <p className="panel-heading">TODO MVC</p>
+            <div className="panel-block">
+              <p className="control">
                 <input
-                  className='input'
-                  type='text'
-                  placeholder='add task'
+                  className="input"
+                  type="text"
+                  placeholder="add task"
                   onKeyPress={this.addTasks}
                 />
               </p>
@@ -92,9 +99,9 @@ class App extends Component {
               tasks={tasks}
               toggleDone={this.handleToggleDone}
             />
-            <div className='panel-block'>
+            <div className="panel-block">
               <button
-                className='button is-link is-outlined is-fullwidth'
+                className="button is-link is-outlined is-fullwidth"
                 onClick={this.removeAll}
               >
                 remove all
