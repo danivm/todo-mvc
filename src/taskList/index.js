@@ -12,8 +12,15 @@ class TaskList extends Component {
     )
   }
 
+  handleDelete = (e) => {
+    e.preventDefault()
+    const { deleteTask } = this.props
+    const id = e.currentTarget.dataset.id
+    deleteTask(id)
+  }
+
   render () {
-    const { deleteTask, tasks, toggleDone } = this.props
+    const { tasks, toggleDone } = this.props
     return (
       <Fragment>
         {Object.keys(tasks)
@@ -24,14 +31,15 @@ class TaskList extends Component {
               <label className='panel-block' key={id}>
                 <input
                   type='checkbox'
-                  defaultChecked={task.done}
+                  checked={task.done}
                   name={id}
-                  onClick={toggleDone}
+                  onChange={toggleDone}
                 />
                 {task.text}
                 <span
                   className='icon has-text-grey-light'
-                  onClick={() => deleteTask(id)}
+                  onClick={this.handleDelete}
+                  data-id={id}
                 >
                   <i className='fas fa-times-circle' />
                 </span>

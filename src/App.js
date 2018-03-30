@@ -12,7 +12,7 @@ class App extends Component {
   state = {
     activeFilter: FILTERS[0],
     tasks: {},
-    loading: false
+    loading: true
   }
 
   componentDidMount () {
@@ -20,9 +20,8 @@ class App extends Component {
   }
 
   getTasks = () => {
-    const tasks = {}
-    this.setState({ loading: true })
-    dbTasks.get().then(snapshot => {
+    dbTasks.onSnapshot(snapshot => {
+      const tasks = {}
       snapshot.forEach(task => {
         tasks[task.id] = task.data()
       })
@@ -42,16 +41,12 @@ class App extends Component {
       const task = { text, done: false }
       const id = Date.now().toString()
       tasks[id] = task
-      this.setState({ tasks })
       dbTasks.doc(id).set(task)
       e.target.value = ''
     }
   }
 
   handleDeleteTask = id => {
-    const { tasks } = this.state
-    delete tasks[id]
-    this.setState({ tasks })
     dbTasks.doc(id).delete()
   }
 
@@ -60,15 +55,12 @@ class App extends Component {
     Object.keys(tasks).map(id => {
       dbTasks.doc(id).delete()
     })
-    tasks = {}
-    this.setState({ tasks })
   }
 
   handleToggleDone = e => {
     let { tasks } = this.state
     const id = e.target.name
     tasks[id].done = !tasks[id].done
-    this.setState({ tasks })
     dbTasks.doc(id).set(tasks[id])
   }
 
