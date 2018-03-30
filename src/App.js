@@ -11,7 +11,8 @@ const dbTasks = db.collection('tasks')
 class App extends Component {
   state = {
     activeFilter: FILTERS[0],
-    tasks: {}
+    tasks: {},
+    loading: false
   }
 
   componentDidMount () {
@@ -20,11 +21,12 @@ class App extends Component {
 
   getTasks = () => {
     const tasks = {}
+    this.setState({ loading: true })
     dbTasks.get().then(snapshot => {
       snapshot.forEach(task => {
         tasks[task.id] = task.data()
       })
-      this.setState({ tasks })
+      this.setState({ tasks, loading: false })
     })
   }
 
@@ -71,7 +73,8 @@ class App extends Component {
   }
 
   render () {
-    const { activeFilter, tasks } = this.state
+    const { activeFilter, tasks, loading } = this.state
+    const loadingClass = loading ? 'is-loading' : ''
 
     return (
       <div className="section">
@@ -101,7 +104,7 @@ class App extends Component {
             />
             <div className="panel-block">
               <button
-                className="button is-link is-outlined is-fullwidth"
+                className={`button is-link is-outlined is-fullwidth ${loadingClass}`}
                 onClick={this.removeAll}
               >
                 remove all
