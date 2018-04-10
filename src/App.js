@@ -1,18 +1,16 @@
 import React, { Component } from 'react'
 import FilterTabs from './filterTabs'
 import TaskList from './taskList'
-import db from './firebase'
 import './App.scss'
 import 'bulma/css/bulma.css'
 
 const FILTERS = ['all', 'todo', 'done']
-const dbTasks = db.collection('tasks')
+const STORAGE_KEY = 'todo-mvc-tasks'
 
 class App extends Component {
   state = {
     activeFilter: FILTERS[0],
-    tasks: {},
-    loading: true
+    tasks: {}
   }
 
   componentDidMount () {
@@ -20,13 +18,8 @@ class App extends Component {
   }
 
   getTasks = () => {
-    dbTasks.onSnapshot(snapshot => {
-      const tasks = {}
-      snapshot.forEach(task => {
-        tasks[task.id] = task.data()
-      })
-      this.setState({ tasks, loading: false })
-    })
+    const tasks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}
+    this.setState({ tasks })
   }
 
   handleChangeFilter = e => {
@@ -41,32 +34,36 @@ class App extends Component {
       const task = { text, done: false }
       const id = Date.now().toString()
       tasks[id] = task
-      dbTasks.doc(id).set(task)
+      this.updateTasks(tasks)
       e.target.value = ''
     }
   }
 
   handleDeleteTask = id => {
-    dbTasks.doc(id).delete()
+    let { tasks } = this.state
+    delete tasks[id]
+    this.updateTasks(tasks)
   }
 
   removeAll = () => {
-    let { tasks } = this.state
-    Object.keys(tasks).map(id => {
-      dbTasks.doc(id).delete()
-    })
+    const tasks = {}
+    this.updateTasks(tasks)
   }
 
   handleToggleDone = e => {
     let { tasks } = this.state
     const id = e.target.name
     tasks[id].done = !tasks[id].done
-    dbTasks.doc(id).set(tasks[id])
+    this.updateTasks(tasks)
+  }
+
+  updateTasks = tasks => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks))
+    this.setState({ tasks })
   }
 
   render () {
-    const { activeFilter, tasks, loading } = this.state
-    const loadingClass = loading ? 'is-loading' : ''
+    const { activeFilter, tasks } = this.state
 
     return (
       <div className="section">
@@ -96,7 +93,7 @@ class App extends Component {
             />
             <div className="panel-block">
               <button
-                className={`button is-link is-outlined is-fullwidth ${loadingClass}`}
+                className={`button is-link is-outlined is-fullwidth`}
                 onClick={this.removeAll}
               >
                 remove all
